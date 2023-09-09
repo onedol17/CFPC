@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastKnownLocation != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            String formatDate = sdf.format(new Date(lastKnownLocation.getTime()));
         }
         // GPS 사용 가능 여부 확인
         boolean isEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -150,13 +150,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 Date date = new Date(now);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
                 getTime = dateFormat.format(date);
-
+                Calendar cToday = Calendar.getInstance();
+                int sec = cToday.get(Calendar.SECOND); // 초
                 if (!String.valueOf(getTime.charAt(0)).equals(y)) {
                     listA.clear();
                 }
 
-                if (!String.valueOf(getTime.charAt(6)).equals(x)) {
-                    value += 10;
+                Log.i("hi", String.valueOf(sec));
+                if (sec%30 == 0) {
+                    value += 30;
                     listA.add(Speed);
                     logFlag = "true";
                 }
