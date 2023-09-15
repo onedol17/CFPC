@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -27,9 +28,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private LocationManager locationManager;
     private Location mLastlocation = null;
     int value = 0;
-    String x = "0";
 
-    String y = "0";
+    int hour_flag = 0;
 
     int Speed;
     List<Integer> listA = new ArrayList<Integer>();
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         test= (TextView)findViewById(R.id.test);
         Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastKnownLocation != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         }
         // GPS 사용 가능 여부 확인
         boolean isEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         double deltaTime = 0;
 
         //  getSpeed() 함수를 이용하여 속도를 계산
-        double getSpeed = Double.parseDouble(String.format("%.3f", location.getSpeed()));
+        @SuppressLint("DefaultLocale") double getSpeed = Double.parseDouble(String.format("%.3f", location.getSpeed()));
         String formatDate = sdf.format(new Date(location.getTime()));
         boolean isStart = false;
 
@@ -87,12 +87,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             double speed = mLastlocation.distanceTo(location) / deltaTime;
 
         }
-        // 현재위치를 지난 위치로 변경
+        /* 현재위치를 지난 위치로 변경 */
         mLastlocation = location;
     }
 
     @Override
-    public void onProviderEnabled(String provider) {
+    public void onProviderEnabled(@NonNull String provider) {
         //권한 체크
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -148,11 +148,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
                 long now = System.currentTimeMillis();
                 Date date = new Date(now);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
                 getTime = dateFormat.format(date);
                 Calendar cToday = Calendar.getInstance();
                 int sec = cToday.get(Calendar.SECOND); // 초
-                if (!String.valueOf(getTime.charAt(0)).equals(y)) {
+                int hour = cToday.get(Calendar.HOUR);
+                if (!Integer.valueOf(hour).equals(hour_flag)) {
                     listA.clear();
                 }
 
@@ -164,12 +165,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 }
 
 
-
-                x = String.valueOf(getTime.charAt(6));
-                y = String.valueOf(getTime.charAt(0));
+                hour_flag = hour;
             }
         }
     }
 
 }
-
