@@ -6,7 +6,6 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -16,6 +15,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,7 +29,10 @@ import java.util.Date;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener{
+
+
+
+public class  MainActivity extends AppCompatActivity implements LocationListener{
 
     private LocationManager locationManager;
     private Location mLastlocation = null;
@@ -32,7 +41,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     int hour_flag = 0;
 
     int Speed;
-    List<Integer> listA = new ArrayList<Integer>();
+
+    int sum_list;
+    List<Integer> listA = new ArrayList<>();
+
+    double CarbonAmount= 0.0;
 
     String logFlag;
     String getTime;
@@ -42,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        TextView textView = (TextView)findViewById(R.id.test);
         //권한 체크
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -49,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        test= (TextView)findViewById(R.id.test);
+        test= (TextView)findViewById(R.id.tv_carbon_amount);
         Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastKnownLocation != null) {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
@@ -68,12 +82,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     @Override
     public void onLocationChanged(@NonNull Location location) {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        double deltaTime = 0;
+        double deltaTime;
 
         //  getSpeed() 함수를 이용하여 속도를 계산
         @SuppressLint("DefaultLocale") double getSpeed = Double.parseDouble(String.format("%.3f", location.getSpeed()));
         String formatDate = sdf.format(new Date(location.getTime()));
-        boolean isStart = false;
 
 
         Speed = (int) getSpeed;
@@ -128,10 +141,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 } catch (Exception e) {
                 }
                 if (logFlag == "true") {
-                    Log.d("VAL", "VALUE: " + String.valueOf(value));
-                    System.out.println(listA);
+                    Log.d("VAL", "VALUE: " + value);
+                    Log.d("VAL", "VALUE: " + listA);
 
-
+                    test.setText(String.valueOf(CarbonAmount));
                     logFlag = "False";
                 }
             }
@@ -154,20 +167,61 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 int sec = cToday.get(Calendar.SECOND); // 초
                 int hour = cToday.get(Calendar.HOUR);
                 if (!Integer.valueOf(hour).equals(hour_flag)) {
+                    for(int i=0; i < listA.size(); i++){
+                        sum_list += listA.get(i);
+                    }
+                    double dt = (((double)sum_list/listA.size())*((double)listA.size()*30));
+                    CarbonAmount = ((((dt/ 16.04) * 2.097) / 0.1) * 0.1);
+
+
+                    Log.i("VAL", String.valueOf(CarbonAmount));
+
+
+                    String fileName = "testnote.txt";
+                    String textToWrite = String.valueOf(CarbonAmount);
+                    FileOutputStream outputStream;
+
+                    try {
+                        outputStream = openFileOutput(fileName , Context.MODE_PRIVATE);
+                        outputStream.write(textToWrite.getBytes());
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     listA.clear();
                 }
 
-                Log.i("hi", String.valueOf(sec));
-                if (sec%30 == 0) {
+                Log.i("VAL", String.valueOf(sec));
+                if (sec%30 == 0 && Speed >= 7) {
+
                     value += 30;
                     listA.add(Speed);
                     logFlag = "true";
                 }
 
-
+                Log.i("VAL", read_file(getApplicationContext(), "testnote.txt"));
                 hour_flag = hour;
             }
         }
     }
-
+    public String read_file(Context context, String filename) {
+        try {
+            FileInputStream fis = context.openFileInput(filename);
+            InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            return sb.toString();
+        } catch (FileNotFoundException e) {
+            return "";
+        } catch (UnsupportedEncodingException e) {
+            return "";
+        } catch (IOException e) {
+            return "";
+        }
+    }
 }

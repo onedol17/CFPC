@@ -6,14 +6,79 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="32dp"
+        android:background="#FFFFFF"
+        android:alpha="0.9">
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="32dp"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="20dp"
+            android:text="누적소모량"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="@color/theme_color" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:layout_width="260dp"
+                android:layout_height="260dp"
+                app:srcCompat="@drawable/shape">
+            </ImageView>
+
+
+
+            <TextView
+                android:id="@+id/tv_carbon_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="90"
+                android:textColor="@color/white"
+                android:textSize="120sp"
+                android:layout_gravity="center"
+                android:paddingBottom="10dp"
+                />
+
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/tree_group"
+            android:layout_width="300dp"
+            android:layout_height="220dp"
+            android:layout_marginTop="180dp"
+            android:layout_gravity="center"
+            android:background="@color/theme_color">
+            <TextView
+                android:id="@+id/test"
+                android:text="0"
+                android:textSize="120sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
